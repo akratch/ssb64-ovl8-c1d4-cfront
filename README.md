@@ -90,6 +90,8 @@ first add a MIPSpro C++ 7.1 legacy-cfront preset.
 - [Static verifier](scripts/verify.sh)
 - [cfront output verifier](scripts/verify-cfront-output.sh)
 - [Scratch rebuild script](scripts/build-scratch.sh)
+- [decomp.me compiler integration](decompme/README.md)
+- [decomp.me-ready C++ scratch](decompme/scratch.cxx)
 
 The two physical backslash-newline splices in the source are intentional and
 measured. Removing them keeps the same 60 instructions but leaves eight
