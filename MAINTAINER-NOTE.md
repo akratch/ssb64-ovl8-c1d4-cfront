@@ -1,20 +1,19 @@
 # Maintainer summary
 
-`func_ovl8_8037C1D4` has an exact C match, a two-word ordinary NCC C++
-residual, and an exact legacy-cfront experiment. It does not yet have a
-zero-difference `ido7.1_c++` NCC match.
+`func_ovl8_8037C1D4` has a proper zero-difference C++ match through the
+authentic MIPSpro C++ 7.1 legacy-cfront route.
 
-The legacy-cfront source is valid C++ and exports the expected mangled symbol.
-It passes through SGI's cfront 3.0.1 translator, then through the project's IDO
-7.1 C backend. The resulting function is exactly 60 instructions / `0xF0`
-bytes, with zero opcode, register, schedule, or raw-word differences. This is a
-compiler-mechanism result, not a conventional NCC or hosted decomp.me match.
+The source is valid C++ and exports the expected mangled symbol. It passes
+through the `cfront` supplied on SGI's November 1996 MIPSpro C++ 7.1 CD, then
+through the project's IDO 7.1 C backend. The resulting function is exactly 60
+instructions / `0xF0` bytes, with zero opcode, register, schedule, or raw-word
+differences.
 
-The conservative integration is a third C split at C1D4:
+The supported integration is a third C++ split at C1D4:
 
 - retain the first IRIX4 region;
 - retain the established IDO 7.1 NCC C++ region;
-- compile C1D4 alone as C with the stock IDO 7.1 C frontend.
+- compile C1D4 alone with MIPSpro C++ 7.1 legacy cfront.
 
 The narrow split matters. A surrounding NCC anchor, `func_ovl8_8037B760`, was
 compiled through the same cfront route and failed structurally (32 instructions
@@ -28,14 +27,14 @@ the tested source geometry.
 
 The repository root also contains `scratch.c`, freshly verified against the
 exported challenge ZIP's exact context and target. It is the downstream IDO
-7.1 C-stage zero. The ZIP's ordinary NCC preset does not match that file.
+7.1 C-stage control. The ZIP's ordinary NCC preset does not match that file
+because decomp.me currently has no legacy-cfront preset.
 
-The only provenance caveat is the translator package. The local IDO 7.1
-extraction omitted its optional OCC/cfront subsystem, so the exact receipt uses
-an authentic IRIX 7.4.4 cfront binary whose emitted banner identifies the same
-AT&T USL cfront 3.0.1 translator, followed by the target IDO 7.1 backend. A
-complete 7.1 OCC/cfront package would be required before promoting the cfront
-experiment from provenance evidence to a stronger production claim.
+Compiler provenance is now direct: the recovered 7.1 translator is distinct
+from the earlier 7.4.4 binary, has a November 12, 1996 SGI build stamp, and
+emits the exact same generated C byte for byte. Its final 240-byte function is
+identical to the target, SHA-1
+`6d2d054e964a274495bcc9953cf5b9cd340f7bcb`.
 
 Start with [the integration note](docs/INTEGRATION.md), then use the
 [exact-match receipt](evidence/EXACT-MATCH.md) and

@@ -1,14 +1,13 @@
 # Compiler provenance
 
-> **Status:** This documents an exact legacy-cfront experiment. It is not an
-> ordinary `ido7.1_c++` NCC match and is not currently reproducible on
-> decomp.me.
+> **Status:** Authentic MIPSpro C++ 7.1 legacy cfront reproduces the function
+> exactly. This compiler route is not currently available on decomp.me.
 
 ## Proven route
 
 The exact object was produced in two compiler stages:
 
-1. SGI's legacy C++ translator converted
+1. The legacy C++ translator from MIPSpro C++ 7.1 converted
    `src/func_ovl8_8037C1D4.C` into `generated/cfront-output.c`.
 2. The generated C was compiled by the project's IDO 7.1 C pipeline
    (`cfe -> uopt -> ugen -> as1`) at `-O2` for big-endian MIPS-II O32.
@@ -25,40 +24,68 @@ The final relocatable object contains one 240-byte function:
 func_ovl8_8037C1D4__FPPUcT1l
 ```
 
+## Authentic 7.1 acquisition
+
+The translator was recovered from SGI part `812-0400-005`, **MIPSpro C++
+7.1**, November 1996. The distribution identifies its compiler subsystem as
+`c++_dev.sw.c++` and contains `usr/lib/OCC` and
+`usr/lib/c++/{cfront,markc++,ptcomp,ptlink}`.
+
+The complete archival filesystem tar was 505,663,488 bytes:
+
+```text
+MD5     4ce49331d9dbc93e09d107597286cff3
+SHA-256 91e386a0e5509488f734e05d3833ca8cd66d117b18dcff28150d39aa29a6400a
+```
+
+The extracted 7.1 translator is a big-endian MIPS-II IRIX executable with:
+
+```text
+SHA-256 173f6cf0dfeba2b667c83a650f83e0ccc4612365455957ce27bf60d42576e157
+banner  AT&T USL C++ Language System <3.0.1> 02/03/92
+stamp   IRIX 6.4:1263370533 built 11/12/96
+```
+
+The matching 7.1 `acpp` has SHA-256
+`c569d619b3711860dd2f9a8d783f53bb54dafa00658a1eaaf93cff68975ae0af`
+and produces the checked-in 1,176-byte preprocessed input byte for byte.
+
+The 7.1 cfront binary is distinct from the later 7.4.4 binary. Nevertheless,
+both translate this source to the exact same 1,794-byte C file, SHA-256
+`8aeeda992c66f6d2195f38fff78d122ab306740b31b33c37d60e17ca6ce32bc3`.
+
+The archival catalog and direct media are linked in
+[the authentic receipt](../evidence/AUTHENTIC-71.md). MIPSpro remains
+proprietary software; no compiler binary is distributed here.
+
 ## Tool receipt
 
 | Component | Receipt SHA-256 |
 |---|---|
-| IRIX 7.4.4 `acpp` | `ef9c554e2ede3fb81998dd7917abb416bd0f7be7e05a1dc55bf00970ea52b915` |
-| IRIX 7.4.4 `cfront` | `9904ad5c2b51563839be78acbb1e00aa015ca19d0b69d5b2f44522eade16e3d4` |
+| MIPSpro 7.1 `acpp` | `c569d619b3711860dd2f9a8d783f53bb54dafa00658a1eaaf93cff68975ae0af` |
+| MIPSpro C++ 7.1 `OCC` | `7f889ad27e8c0c0005580650a347a1b9afcbc95afb8d0c6707584b3b3c7379f0` |
+| MIPSpro C++ 7.1 `cfront` | `173f6cf0dfeba2b667c83a650f83e0ccc4612365455957ce27bf60d42576e157` |
 | IRIX 6.0 O32 `libC.so` | `6017cc3bc1ea7b1793425b19456b3cbc87d80393011f70fa50b12f5ae3fc0cea` |
 | Project IDO 7.1 `cc` wrapper | `fdc7cbaa936e11b731c9b50118d106efae71a299d59f1e8e2cd126306acbf78f` |
 
 These proprietary components are identified for provenance only and are not
 part of this repository.
 
-## Packaging caveat
+## Runtime note
 
-The available local IDO 7.1 extraction lacked the optional OCC/cfront files.
-The authentic cfront binary available locally was from an IRIX 7.4.4 package.
-That package's `usr/lib/libC.so` was a zero-byte placeholder, so cfront was run
-in an ephemeral IRIX root containing the authentic O32 `libC.so` from the 6.0
-package. The archived compiler trees were not modified.
-
-This runtime substitution only allowed the translator to start. The generated
-C is checked in and identifies the translator version directly. All target
-code generation used the IDO 7.1 C pipeline.
+`libC.so` belongs to the separate IRIX C++ execution-environment product, not
+the `c++_dev` compiler CD. The translator was run in an ephemeral IRIX root
+using an authentic O32 `libC.so` from the local IRIX 6.0 package. That shared
+library only allows the translator executable to start; the recovered 7.1
+translator itself produced the generated C. All target code generation used
+the IDO 7.1 C pipeline.
 
 ## What the receipt establishes
 
-It establishes that a documented legacy-cfront C++ route can produce the exact
-function and expected C++ linkage. It does not establish that the original
-build used the specific 7.4.4 executable copied in this experiment.
-
-The strongest remaining provenance check is to repeat the translation with a
-complete IDO 7.1 OCC/cfront installation. Any result should be recorded with
-the translator banner, binary hashes, generated-C hash, and final function
-hash.
+It establishes a complete, exact C++ compiler route using the authentic 7.1
+translator and the target IDO 7.1 backend. It does not by itself prove which
+per-file compiler flags HAL used, but it removes the former 7.4.4-version
+caveat and satisfies the matching requirement.
 
 ## Source and artifact hashes
 
@@ -80,3 +107,5 @@ register metadata are unchanged.
 
 - [SGI C++ release notes](https://archive.irixnet.org/siliconsurf/tech/relnotes/6_0rel/cpp_dev.html)
 - [IRIX 5.3 CC/NCC manual](https://techpubs.jurassic.nl/manpages_0530/cat1/CC.html)
+- [SGI media catalog](https://jrra.zone/sgi/index-with-ids.html)
+- [SGI installation table](https://techpubs.jurassic.nl/library/manuals/2000/007-2852-002/sgi_html/apa.html)

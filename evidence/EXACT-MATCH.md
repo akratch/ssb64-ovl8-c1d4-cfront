@@ -1,7 +1,7 @@
 # Exact-match receipt
 
-This receipt is for the local legacy-cfront experiment. The ordinary IDO 7.1
-NCC/EDG C++ route remains two words short of the target.
+This receipt is for the authentic MIPSpro C++ 7.1 legacy-cfront route. The
+ordinary IDO 7.1 NCC/EDG route remains two words short of the target.
 
 ## Candidate
 
@@ -51,3 +51,18 @@ function. They are not part of C1D4 and are excluded from the comparison.
 
 These controls establish both the source-line causality of the exact candidate
 and the narrow scope of the cfront compiler split.
+
+## Authentic 7.1 reproduction
+
+The `cfront` extracted from SGI CD `812-0400-005` generated
+`generated/cfront-output.c` byte for byte. A fresh IDO 7.1 backend build then
+produced a 240-byte `.text` section identical to the target:
+
+```text
+candidate bytes: 240
+target bytes:    240
+candidate SHA-1: 6d2d054e964a274495bcc9953cf5b9cd340f7bcb
+target SHA-1:    6d2d054e964a274495bcc9953cf5b9cd340f7bcb
+```
+
+See [AUTHENTIC-71.md](AUTHENTIC-71.md) for media and tool hashes.
