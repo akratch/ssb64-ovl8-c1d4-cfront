@@ -46,7 +46,10 @@ if [ "$target_size" -lt 240 ]; then
     exit 1
 fi
 
-if ! cmp -n 240 "$work_dir/candidate.text" "$work_dir/target.text"; then
+dd if="$work_dir/target.text" of="$work_dir/target-function.text" \
+    bs=240 count=1 2>/dev/null
+
+if ! cmp "$work_dir/candidate.text" "$work_dir/target-function.text"; then
     echo "mismatch: the first 240 .text bytes differ" >&2
     exit 1
 fi

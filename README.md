@@ -42,9 +42,36 @@ narrow mechanism for C1D4, not a replacement for the coherent NCC span.
 See [Integration](docs/INTEGRATION.md) for the proposed layout and the source
 details that must be preserved.
 
+## ZIP-compatible `scratch.c`
+
+The root [scratch.c](scratch.c) is a clean downstream C-stage source for the
+exported `func_ovl8_8037C1D4 (1).zip` challenge. It was rebuilt using:
+
+- the ZIP's `ctx.c++`, byte for byte;
+- the ZIP's `target.o`;
+- the same `-O2 -mips2` target settings;
+- the stock IDO 7.1 C pipeline.
+
+The fresh object has a 240-byte `.text` section identical to the target
+function and contains no relocations. See the
+[scratch receipt](evidence/SCRATCH-RECEIPT.md), or rebuild it with:
+
+```sh
+SSB_REPO=/path/to/ssb-decomp-re \
+./scripts/build-scratch.sh '/path/to/func_ovl8_8037C1D4 (1).zip' /tmp/c1d4-build
+```
+
+The compiler distinction is essential. The ZIP metadata selects ordinary
+`ido7.1_c++` NCC; compiling `scratch.c` directly through that frontend does
+not match. `scratch.c` is the exact C-stage control produced by the compiler
+model described here. The corresponding valid C++ input remains
+[src/func_ovl8_8037C1D4.C](src/func_ovl8_8037C1D4.C), which must first pass
+through legacy cfront.
+
 ## Repository contents
 
 - [Exact C++ source](src/func_ovl8_8037C1D4.C)
+- [ZIP-compatible C scratch](scratch.c)
 - [Generated cfront C](generated/cfront-output.c)
 - [Matching object](artifacts/func_ovl8_8037C1D4.o)
 - [Exact-match receipt](evidence/EXACT-MATCH.md)
@@ -52,6 +79,7 @@ details that must be preserved.
 - [Compiler provenance](docs/COMPILER-PROVENANCE.md)
 - [NCC investigation](docs/NCC-INVESTIGATION.md)
 - [Static verifier](scripts/verify.sh)
+- [Scratch rebuild script](scripts/build-scratch.sh)
 
 The two physical backslash-newline splices in the source are intentional and
 measured. Removing them keeps the same 60 instructions but leaves eight

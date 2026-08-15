@@ -23,6 +23,11 @@ them retains the instruction multiset but leaves eight schedule differences.
 The unused local and explicit post-decrement temporaries are likewise part of
 the tested source geometry.
 
+The repository root also contains `scratch.c`, freshly verified against the
+exported challenge ZIP's exact context and target. It is the downstream IDO
+7.1 C-stage control. The ZIP's ordinary NCC preset does not match that file;
+the production C++ source reaches it through legacy cfront.
+
 The only provenance caveat is the translator package. The local IDO 7.1
 extraction omitted its optional OCC/cfront subsystem, so the exact receipt uses
 an authentic IRIX 7.4.4 cfront binary whose emitted banner identifies the same

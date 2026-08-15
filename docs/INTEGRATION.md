@@ -13,6 +13,10 @@ Use three source/compiler regions for this portion of `ovl8_8`:
 The third region contains only C1D4. This is the smallest split supported by
 the compiler evidence.
 
+The root `scratch.c` is a downstream CFE verification control for the exported
+challenge context. It is not the production C++ source and should not replace
+the cfront split in the final source tree.
+
 ## Source constraints
 
 Use [the tested source](../src/func_ovl8_8037C1D4.C) verbatim for the first
