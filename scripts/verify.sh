@@ -7,7 +7,7 @@ if [ "$#" -ne 1 ]; then
     exit 2
 fi
 
-repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+repo_dir=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 candidate="$repo_dir/artifacts/func_ovl8_8037C1D4.o"
 target=$1
 

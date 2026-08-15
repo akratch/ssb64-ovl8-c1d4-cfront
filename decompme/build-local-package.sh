@@ -16,7 +16,7 @@ for variable in IDO71_DIR CXX71_ROOT IRIX_RUNTIME_ROOT IRIX6_ROOT; do
 done
 
 output=$1
-repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+repo_dir=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 
 if [ -e "$output" ]; then
     echo "refusing to overwrite existing output directory: $output" >&2

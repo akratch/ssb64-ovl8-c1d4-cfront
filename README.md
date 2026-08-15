@@ -35,8 +35,10 @@ legacy-cfront control. A fresh IDO 7.1 backend build produces all 240 target
 bytes exactly.
 
 This does not make the existing decomp.me scratch a zero: its compiler ID is
-the ordinary NCC frontend. decomp.me needs a separate legacy-cfront compiler
-preset before it can host this C++ match.
+the ordinary NCC frontend. A separate legacy-cfront preset is required. This
+repository now includes apply-ready patches for both decomp.me repositories,
+and the resulting compiler image has reproduced the original scratch context
+and all 240 target bytes exactly.
 
 ## Recommended split
 
@@ -92,6 +94,10 @@ first add a MIPSpro C++ 7.1 legacy-cfront preset.
 - [Scratch rebuild script](scripts/build-scratch.sh)
 - [decomp.me compiler integration](decompme/README.md)
 - [decomp.me-ready C++ scratch](decompme/scratch.cxx)
+- [decomp.me application patch](patches/decompme-app.patch)
+- [decomp.me compiler-image patch](patches/decompme-compilers.patch)
+- [Hosted-style compiler image receipt](evidence/DECOMPME-IMAGE.md)
+- [Maintainer handoff](HANDOFF.md)
 
 The two physical backslash-newline splices in the source are intentional and
 measured. Removing them keeps the same 60 instructions but leaves eight

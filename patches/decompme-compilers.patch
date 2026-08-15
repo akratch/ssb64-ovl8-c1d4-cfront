@@ -1,0 +1,327 @@
+From 6172687bb799cd32545a30eea9fb901fede4be18 Mon Sep 17 00:00:00 2001
+From: akratch <kratch.adam@gmail.com>
+Date: Sat, 15 Aug 2026 22:45:03 +0200
+Subject: [PATCH] Add IDO 7.1 legacy cfront compiler image
+
+---
+ platforms/n64/ido7.1_cfront/linux/Dockerfile |  69 ++++++++++
+ scripts/cc-cfront                            | 130 +++++++++++++++++++
+ templates/n64/ido71_cfront.j2                |  66 ++++++++++
+ values.yaml                                  |  18 +++
+ 4 files changed, 283 insertions(+)
+ create mode 100644 platforms/n64/ido7.1_cfront/linux/Dockerfile
+ create mode 100644 scripts/cc-cfront
+ create mode 100644 templates/n64/ido71_cfront.j2
+
+diff --git a/platforms/n64/ido7.1_cfront/linux/Dockerfile b/platforms/n64/ido7.1_cfront/linux/Dockerfile
+new file mode 100644
+index 0000000..87a5555
+--- /dev/null
++++ b/platforms/n64/ido7.1_cfront/linux/Dockerfile
+@@ -0,0 +1,69 @@
++# NOTE: This file is generated automatically via template.py. Do not edit manually!
++
++
++FROM gcc:14 AS base
++
++RUN apt-get update \
++    && apt-get install -y --no-install-recommends ca-certificates curl ncompress wget xz-utils \
++    && rm -rf /var/lib/apt/lists/*
++
++WORKDIR /tmp/build
++
++RUN wget -O ido71.tar.gz "https://github.com/decompals/ido-static-recomp/releases/download/v1.2/ido-7.1-recomp-linux.tar.gz" \
++    && mkdir ido71 \
++    && tar xzf ido71.tar.gz -C ido71
++
++RUN mkdir dist \
++    && curl --fail --location --retry 3 \
++        --range "125260288-125423674" \
++        --output dist/c++_dev.idb "https://jrra.zone/sgi/tar/MIPSpro%20C%2b%2b%207.1.tar" \
++    && echo "84bba65ed2165ef335b09024b28c80fb5601e54c37255e7cf556c48f99564623  dist/c++_dev.idb" | sha256sum -c - \
++    && curl --fail --location --retry 3 \
++        --range "126331392-135482843" \
++        --output dist/c++_dev.sw "https://jrra.zone/sgi/tar/MIPSpro%20C%2b%2b%207.1.tar" \
++    && echo "878e6bef1d45a67a9c5aa4e14c7433e2e7dbe01de3f5cef92ebc44c9b9da3531  dist/c++_dev.sw" | sha256sum -c -
++
++RUN wget -O irixswextract.c "https://gist.githubusercontent.com/camthesaxman/dcc60d98f152b4fed32dfc18d7246551/raw/dda1b80bfe90f93d5de23936b92caf2ca41a53db/irixswextract.c" \
++    && echo "514f4f73bcd74d8a739674eabd2b637e0052a57611f3c4c9755703756ba05d58  irixswextract.c" | sha256sum -c - \
++    && cc -O2 -Wall -Wextra irixswextract.c -o irixswextract \
++    && grep ' usr/lib/c++/cfront ' dist/c++_dev.idb > cfront.idb \
++    && mkdir cxx71 \
++    && ./irixswextract dist cfront.idb cxx71
++
++RUN wget -O mipspro744.tar.xz "https://github.com/LLONSIT/qemu-irix-helpers/raw/n/qemu/mipspro7.4.4.tar.xz" \
++    && echo "df33be0d9605b00b44070e567121fc00283a9b1f97763403f0898d2216028d24  mipspro744.tar.xz" | sha256sum -c - \
++    && mkdir runtime \
++    && tar xJf mipspro744.tar.xz -C runtime \
++        lib/rld lib/libc.so.1 lib/libmalloc.so \
++        usr/bin/qemu-irix usr/lib/libc.so.1
++
++RUN wget -O ido60.tar.xz "https://github.com/LLONSIT/qemu-irix-helpers/raw/n/qemu/ido6.0.tar.xz" \
++    && echo "c56d4be020bdaf76310ceec455ebc0d443fb7a46c740491f74898b04f6a60356  ido60.tar.xz" | sha256sum -c - \
++    && tar xJf ido60.tar.xz -C runtime usr/lib/libC.so
++
++RUN mkdir -p \
++        /compilers/n64/ido7.1_cfront/irix/usr/lib/c++ \
++        /compilers/n64/ido7.1_cfront/irix/usr/lib \
++        /compilers/n64/ido7.1_cfront/irix/lib \
++        /compilers/n64/ido7.1_cfront/irix/usr/tmp \
++    && cp -a ido71/. /compilers/n64/ido7.1_cfront/ \
++    && cp cxx71/usr/lib/c++/cfront \
++        /compilers/n64/ido7.1_cfront/irix/usr/lib/c++/cfront \
++    && cp runtime/usr/bin/qemu-irix \
++        /compilers/n64/ido7.1_cfront/qemu-irix \
++    && cp runtime/usr/lib/libC.so runtime/usr/lib/libc.so.1 \
++        /compilers/n64/ido7.1_cfront/irix/usr/lib/ \
++    && cp runtime/lib/rld runtime/lib/libc.so.1 runtime/lib/libmalloc.so \
++        /compilers/n64/ido7.1_cfront/irix/lib/
++
++COPY scripts/cc-cfront /compilers/n64/ido7.1_cfront/cc-cfront
++
++RUN chown -R root:root /compilers/n64/ido7.1_cfront \
++    && chmod +x \
++        /compilers/n64/ido7.1_cfront/cc-cfront \
++        /compilers/n64/ido7.1_cfront/qemu-irix \
++        /compilers/n64/ido7.1_cfront/irix/usr/lib/c++/cfront
++
++FROM scratch AS release
++
++COPY --from=base /compilers /compilers
+diff --git a/scripts/cc-cfront b/scripts/cc-cfront
+new file mode 100644
+index 0000000..fcedb8e
+--- /dev/null
++++ b/scripts/cc-cfront
+@@ -0,0 +1,130 @@
++#!/usr/bin/env python3
++
++"""decomp.me compiler wrapper for the MIPSpro C++ 7.1 cfront route."""
++
++from __future__ import annotations
++
++import os
++from pathlib import Path
++import subprocess
++import sys
++import tempfile
++
++
++def fail(message: str) -> None:
++    print(f"cc-cfront: {message}", file=sys.stderr)
++    raise SystemExit(2)
++
++
++def split_arguments(arguments: list[str]) -> tuple[Path, Path, list[str]]:
++    args = arguments.copy()
++    output: Path | None = None
++
++    index = 0
++    while index < len(args):
++        if args[index] == "-o":
++            if index + 1 == len(args):
++                fail("missing argument after -o")
++            output = Path(args[index + 1])
++            del args[index : index + 2]
++            continue
++        index += 1
++
++    if output is None:
++        fail("an output path must be supplied with -o")
++    if not args or args[-1].startswith("-"):
++        fail("the input source must be the final argument")
++
++    source = Path(args.pop())
++    return source, output, args
++
++
++def preprocessor_arguments(driver_args: list[str]) -> list[str]:
++    result = [
++        "-+",
++        "-D__cplusplus=1",
++        "-D_LANGUAGE_C_PLUS_PLUS",
++        "-DLANGUAGE_C_PLUS_PLUS",
++    ]
++
++    index = 0
++    while index < len(driver_args):
++        arg = driver_args[index]
++        if arg in {"-D", "-U", "-I"}:
++            if index + 1 == len(driver_args):
++                fail(f"missing argument after {arg}")
++            result.extend((arg, driver_args[index + 1]))
++            index += 2
++            continue
++        if arg.startswith(("-D", "-U", "-I")) and len(arg) > 2:
++            result.append(arg)
++        index += 1
++
++    return result
++
++
++def run(
++    command: list[str],
++    *,
++    stdin: object | None = None,
++    stdout: object | None = None,
++    env: dict[str, str] | None = None,
++) -> None:
++    subprocess.run(
++        command,
++        stdin=stdin,
++        stdout=stdout,
++        env=env,
++        check=True,
++    )
++
++
++def main() -> None:
++    source, output, driver_args = split_arguments(sys.argv[1:])
++    compiler_dir = Path(__file__).resolve().parent
++    irix_root = compiler_dir / "irix"
++
++    acpp = compiler_dir / "acpp"
++    cfront = irix_root / "usr/lib/c++/cfront"
++    qemu_irix = compiler_dir / "qemu-irix"
++    cc = compiler_dir / "cc"
++
++    for tool in (acpp, cfront, qemu_irix, cc):
++        if not tool.is_file():
++            fail(f"missing compiler component: {tool}")
++
++    with tempfile.TemporaryDirectory(prefix="ido71-cfront-") as temp_name:
++        temp_dir = Path(temp_name)
++        preprocessed = temp_dir / "input.i"
++        translated = temp_dir / "translated.c"
++
++        with preprocessed.open("wb") as output_file:
++            run(
++                [str(acpp), *preprocessor_arguments(driver_args), str(source)],
++                stdout=output_file,
++            )
++
++        with preprocessed.open("rb") as input_file, translated.open("wb") as output_file:
++            run(
++                [
++                    str(qemu_irix),
++                    "-silent",
++                    "-L",
++                    str(irix_root),
++                    str(cfront),
++                    f"+f{source.name}",
++                ],
++                stdin=input_file,
++                stdout=output_file,
++            )
++
++        compiler_env = os.environ.copy()
++        compiler_env["USR_LIB"] = str(compiler_dir)
++        run(
++            [str(cc), *driver_args, "-o", str(output), str(translated)],
++            env=compiler_env,
++        )
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/templates/n64/ido71_cfront.j2 b/templates/n64/ido71_cfront.j2
+new file mode 100644
+index 0000000..e128f7a
+--- /dev/null
++++ b/templates/n64/ido71_cfront.j2
+@@ -0,0 +1,66 @@
++FROM gcc:14 AS base
++
++RUN apt-get update \
++    && apt-get install -y --no-install-recommends ca-certificates curl ncompress wget xz-utils \
++    && rm -rf /var/lib/apt/lists/*
++
++WORKDIR /tmp/build
++
++RUN wget -O ido71.tar.gz "{{ ido71_recomp }}" \
++    && mkdir ido71 \
++    && tar xzf ido71.tar.gz -C ido71
++
++RUN mkdir dist \
++    && curl --fail --location --retry 3 \
++        --range "{{ cxx71_idb_range }}" \
++        --output dist/c++_dev.idb "{{ cxx71_media }}" \
++    && echo "{{ cxx71_idb_sha256 }}  dist/c++_dev.idb" | sha256sum -c - \
++    && curl --fail --location --retry 3 \
++        --range "{{ cxx71_sw_range }}" \
++        --output dist/c++_dev.sw "{{ cxx71_media }}" \
++    && echo "{{ cxx71_sw_sha256 }}  dist/c++_dev.sw" | sha256sum -c -
++
++RUN wget -O irixswextract.c "{{ irixswextract }}" \
++    && echo "{{ irixswextract_sha256 }}  irixswextract.c" | sha256sum -c - \
++    && cc -O2 -Wall -Wextra irixswextract.c -o irixswextract \
++    && grep ' usr/lib/c++/cfront ' dist/c++_dev.idb > cfront.idb \
++    && mkdir cxx71 \
++    && ./irixswextract dist cfront.idb cxx71
++
++RUN wget -O mipspro744.tar.xz "{{ mipspro744 }}" \
++    && echo "{{ mipspro744_sha256 }}  mipspro744.tar.xz" | sha256sum -c - \
++    && mkdir runtime \
++    && tar xJf mipspro744.tar.xz -C runtime \
++        lib/rld lib/libc.so.1 lib/libmalloc.so \
++        usr/bin/qemu-irix usr/lib/libc.so.1
++
++RUN wget -O ido60.tar.xz "{{ ido60 }}" \
++    && echo "{{ ido60_sha256 }}  ido60.tar.xz" | sha256sum -c - \
++    && tar xJf ido60.tar.xz -C runtime usr/lib/libC.so
++
++RUN mkdir -p \
++        /compilers/{{ platform }}/{{ id }}/irix/usr/lib/c++ \
++        /compilers/{{ platform }}/{{ id }}/irix/usr/lib \
++        /compilers/{{ platform }}/{{ id }}/irix/lib \
++        /compilers/{{ platform }}/{{ id }}/irix/usr/tmp \
++    && cp -a ido71/. /compilers/{{ platform }}/{{ id }}/ \
++    && cp cxx71/usr/lib/c++/cfront \
++        /compilers/{{ platform }}/{{ id }}/irix/usr/lib/c++/cfront \
++    && cp runtime/usr/bin/qemu-irix \
++        /compilers/{{ platform }}/{{ id }}/qemu-irix \
++    && cp runtime/usr/lib/libC.so runtime/usr/lib/libc.so.1 \
++        /compilers/{{ platform }}/{{ id }}/irix/usr/lib/ \
++    && cp runtime/lib/rld runtime/lib/libc.so.1 runtime/lib/libmalloc.so \
++        /compilers/{{ platform }}/{{ id }}/irix/lib/
++
++COPY scripts/cc-cfront /compilers/{{ platform }}/{{ id }}/cc-cfront
++
++RUN chown -R root:root /compilers/{{ platform }}/{{ id }} \
++    && chmod +x \
++        /compilers/{{ platform }}/{{ id }}/cc-cfront \
++        /compilers/{{ platform }}/{{ id }}/qemu-irix \
++        /compilers/{{ platform }}/{{ id }}/irix/usr/lib/c++/cfront
++
++FROM scratch AS release
++
++COPY --from=base /compilers /compilers
+diff --git a/values.yaml b/values.yaml
+index f02e58d..6052ceb 100644
+--- a/values.yaml
++++ b/values.yaml
+@@ -124,6 +124,24 @@ compilers:
+     arch: darwin
+     file: https://github.com/decompals/ido-static-recomp/releases/download/v1.2/ido-7.1-recomp-macos.tar.gz
+ 
++  - id: ido7.1_cfront
++    platform: n64
++    template: n64/ido71_cfront
++    arch: linux
++    ido71_recomp: https://github.com/decompals/ido-static-recomp/releases/download/v1.2/ido-7.1-recomp-linux.tar.gz
++    cxx71_media: https://jrra.zone/sgi/tar/MIPSpro%20C%2b%2b%207.1.tar
++    # Exact data ranges for dist/c++_dev.{idb,sw} in the uncompressed media tar.
++    cxx71_idb_range: 125260288-125423674
++    cxx71_idb_sha256: 84bba65ed2165ef335b09024b28c80fb5601e54c37255e7cf556c48f99564623
++    cxx71_sw_range: 126331392-135482843
++    cxx71_sw_sha256: 878e6bef1d45a67a9c5aa4e14c7433e2e7dbe01de3f5cef92ebc44c9b9da3531
++    irixswextract: https://gist.githubusercontent.com/camthesaxman/dcc60d98f152b4fed32dfc18d7246551/raw/dda1b80bfe90f93d5de23936b92caf2ca41a53db/irixswextract.c
++    irixswextract_sha256: 514f4f73bcd74d8a739674eabd2b637e0052a57611f3c4c9755703756ba05d58
++    mipspro744: https://github.com/LLONSIT/qemu-irix-helpers/raw/n/qemu/mipspro7.4.4.tar.xz
++    mipspro744_sha256: df33be0d9605b00b44070e567121fc00283a9b1f97763403f0898d2216028d24
++    ido60: https://github.com/LLONSIT/qemu-irix-helpers/raw/n/qemu/ido6.0.tar.xz
++    ido60_sha256: c56d4be020bdaf76310ceec455ebc0d443fb7a46c740491f74898b04f6a60356
++
+   - id: mips_pro_744
+     platform: n64
+     template: common/default

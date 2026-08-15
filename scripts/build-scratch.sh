@@ -14,7 +14,7 @@ fi
 
 archive=$1
 output_dir=$2
-repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+repo_dir=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 ido_root=${IDO71_ROOT:-"$SSB_REPO/tools/ido-recomp/7.1"}
 
 if [ ! -f "$archive" ]; then

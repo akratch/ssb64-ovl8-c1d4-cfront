@@ -66,9 +66,28 @@ candidate SHA-1: 6d2d054e964a274495bcc9953cf5b9cd340f7bcb
 target SHA-1:    6d2d054e964a274495bcc9953cf5b9cd340f7bcb
 ```
 
-This is the source to paste into a future `ido7.1_cfront` scratch:
+This is the source to paste into an `ido7.1_cfront` scratch after the preset is
+deployed:
 [`scratch.cxx`](scratch.cxx). Its five leading blank lines and two physical
 backslash-newline splices are intentional.
+
+## Ready-to-apply patches
+
+Two format-patch files are included:
+
+- [`decompme-compilers.patch`](../patches/decompme-compilers.patch), based on
+  `decompme/compilers` commit `9083bacade9276cf6b48a5a628adcbeee53499a6`;
+- [`decompme-app.patch`](../patches/decompme-app.patch), based on
+  `decompme/decomp.me` commit `95329db504c88750fa932c81fd405834ffb372d8`.
+
+The compiler patch downloads only the two required `c++_dev` byte ranges from
+the uncompressed archival media tar (9,314,839 bytes total), verifies both by
+SHA-256, extracts only `cfront`, and assembles a minimal compiler directory.
+No SGI binary is committed to either patch or this repository.
+
+The generated image was built and then used with the exact exported `mdYYe`
+context, source composition, flags, and target. The result was byte-identical;
+see [`DECOMPME-IMAGE.md`](../evidence/DECOMPME-IMAGE.md).
 
 ## Application changes
 
@@ -79,6 +98,20 @@ decomp.me needs three small application changes:
 2. Add its compiler image to the N64 Linux compiler list.
 3. Add a UI label such as `IDO 7.1 C++ (legacy cfront)`.
 
-The compiler image must be built separately because MIPSpro is proprietary.
-The source media and exact tool hashes are recorded in
-[`evidence/AUTHENTIC-71.md`](../evidence/AUTHENTIC-71.md).
+The compiler image is built from archival media at deployment time because
+MIPSpro is proprietary. The source media and exact tool hashes are recorded in
+[`AUTHENTIC-71.md`](../evidence/AUTHENTIC-71.md).
+
+## Creating the hosted scratch
+
+Once both patches are deployed:
+
+1. Import the original `mdYYe` scratch or its exported ZIP.
+2. Select `IDO 7.1 C++ (legacy cfront)`.
+3. Keep flags `-O2 -mips2`.
+4. Replace only the source pane with [`scratch.cxx`](scratch.cxx), preserving
+   its leading blank lines and trailing backslashes.
+5. Compile. The expected score is zero.
+
+Until the new preset is deployed, ordinary `IDO 7.1 C++` continues to use NCC
+and cannot host this exact result.

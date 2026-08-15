@@ -16,7 +16,7 @@ the checked-in generated C byte for byte, and the IDO 7.1 backend produces:
 The root `scratch.c` independently reproduces the same target as a stock IDO
 7.1 C-stage control against the exported decomp.me ZIP.
 
-## What decomp.me still lacks
+## decomp.me status
 
 The current `ido7.1_c++` preset selects NCC/EDG, not legacy cfront. The
 strongest NCC candidate preserves the complete 60-instruction structure and
@@ -33,6 +33,13 @@ NCC best:  andi  t0,t2,0xff
 That is a two-word NCC register-allocation residue. It does not invalidate the
 exact C++ result; it demonstrates that decomp.me needs a distinct compiler
 preset.
+
+Apply-ready changes for that preset are included in
+[`patches/decompme-compilers.patch`](patches/decompme-compilers.patch) and
+[`patches/decompme-app.patch`](patches/decompme-app.patch). The compiler image
+built from those changes reproduces the original `mdYYe` context and target at
+zero words. Production decomp.me still needs to merge and deploy the preset
+before a public zero-score scratch can be created.
 
 ## Recommended decision
 

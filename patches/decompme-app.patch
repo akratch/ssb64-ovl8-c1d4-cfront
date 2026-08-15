@@ -1,0 +1,61 @@
+From 3df31f3236e50c54371881073d92531637b03d5b Mon Sep 17 00:00:00 2001
+From: akratch <kratch.adam@gmail.com>
+Date: Sat, 15 Aug 2026 22:45:08 +0200
+Subject: [PATCH] Add IDO 7.1 legacy cfront preset
+
+---
+ backend/compilers/compilers.linux.yaml          | 1 +
+ backend/coreapp/compilers.py                    | 8 ++++++++
+ frontend/src/lib/i18n/locales/en/compilers.json | 1 +
+ 3 files changed, 10 insertions(+)
+
+diff --git a/backend/compilers/compilers.linux.yaml b/backend/compilers/compilers.linux.yaml
+index 86cf333..b72a8c0 100644
+--- a/backend/compilers/compilers.linux.yaml
++++ b/backend/compilers/compilers.linux.yaml
+@@ -57,6 +57,7 @@ n64:
+   - ido5.3_c++
+   - ido6.0
+   - ido7.1
++  - ido7.1_cfront
+   - mips_pro_744
+   - egcs_1.1.2-4
+   - egcs_1.1.2-4c
+diff --git a/backend/coreapp/compilers.py b/backend/coreapp/compilers.py
+index 247632f..9da1173 100644
+--- a/backend/coreapp/compilers.py
++++ b/backend/coreapp/compilers.py
+@@ -944,6 +944,13 @@ IDO71_CXX = IDOCompiler(
+     language=Language.OLD_CXX,
+ )
+ 
++IDO71_CFRONT = IDOCompiler(
++    id="ido7.1_cfront",
++    platform=N64,
++    cc='"${COMPILER_DIR}/cc-cfront" -c -Xcpluscomm -G0 -non_shared -Wab,-r4300_mul -woff 649,838,712 -32 ${COMPILER_FLAGS} -o "${OUTPUT}" "${INPUT}"',
++    language=Language.OLD_CXX,
++)
++
+ IDO60 = IDOCompiler(
+     id="ido6.0",
+     platform=N64,
+@@ -1856,6 +1863,7 @@ _all_compilers: list[Compiler] = [
+     IDO71,
+     IDO71_IRIX4,
+     IDO71_CXX,
++    IDO71_CFRONT,
+     MIPS_PRO_744,
+     GCC272KMC,
+     GCC272SN0001,
+diff --git a/frontend/src/lib/i18n/locales/en/compilers.json b/frontend/src/lib/i18n/locales/en/compilers.json
+index 9d03725..19b4638 100644
+--- a/frontend/src/lib/i18n/locales/en/compilers.json
++++ b/frontend/src/lib/i18n/locales/en/compilers.json
+@@ -105,6 +105,7 @@
+     "ido7.1": "IDO 7.1",
+     "ido7.1_irix4": "IDO 7.1 (IRIX 4 frontend)",
+     "ido7.1_c++": "IDO 7.1 C++",
++    "ido7.1_cfront": "IDO 7.1 C++ (legacy cfront)",
+     "ido7.1Pascal": "IDO 7.1 Pascal",
+ 
+     "mips_pro_744": "MIPS Pro 7.4.4",

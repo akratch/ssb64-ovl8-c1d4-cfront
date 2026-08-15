@@ -13,7 +13,7 @@ if [ -z "${CFRONT:-}" ]; then
 fi
 
 output=$1
-repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+repo_dir=$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)
 input="$repo_dir/generated/input-exact.i"
 reference="$repo_dir/generated/cfront-output.c"
 
