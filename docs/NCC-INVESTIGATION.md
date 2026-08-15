@@ -54,5 +54,6 @@ seen in NCC is absent. The IDO C optimizer can therefore keep the complete
 chain in `t0`.
 
 This is a frontend-lowering distinction, not an unresolved algorithm or loop
-reconstruction issue. The legacy cfront result supplies the missing C++
-provenance without an allocator hack.
+reconstruction issue. The legacy cfront result demonstrates an alternative
+C++-to-C mechanism without an allocator hack; it does not close the ordinary
+NCC C++ match.

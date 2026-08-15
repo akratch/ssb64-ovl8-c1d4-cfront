@@ -1,5 +1,9 @@
 # Compiler provenance
 
+> **Status:** This documents an exact legacy-cfront experiment. It is not an
+> ordinary `ido7.1_c++` NCC match and is not currently reproducible on
+> decomp.me.
+
 ## Proven route
 
 The exact object was produced in two compiler stages:

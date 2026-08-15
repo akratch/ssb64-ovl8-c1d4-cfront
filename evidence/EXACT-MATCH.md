@@ -1,5 +1,8 @@
 # Exact-match receipt
 
+This receipt is for the local legacy-cfront experiment. The ordinary IDO 7.1
+NCC/EDG C++ route remains two words short of the target.
+
 ## Candidate
 
 ```text

@@ -60,7 +60,7 @@ and 43 opcodes.
 This is expected and is central to the provenance result:
 
 ```text
-production C++ source -> legacy cfront -> exact C-stage source -> IDO 7.1 CFE
+candidate C++ source -> legacy cfront -> exact C-stage source -> IDO 7.1 CFE
 ```
 
 The root `scratch.c` preserves the exact downstream stage so the challenge can

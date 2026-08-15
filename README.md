@@ -1,18 +1,23 @@
-# `func_ovl8_8037C1D4`: exact legacy-cfront match
+# `func_ovl8_8037C1D4`: compiler-provenance handoff
 
-This repository contains a zero-difference C++ match for Super Smash Bros.
-function `func_ovl8_8037C1D4`.
+This repository records three different compiler results for Super Smash Bros.
+function `func_ovl8_8037C1D4`. They should not be conflated.
 
-| Result | Value |
-|---|---:|
-| Function size | 60 instructions / `0xF0` bytes |
-| Differing instruction words | **0** |
-| Opcode differences | **0** |
-| Register differences | **0** |
-| Candidate text SHA-1 | `6d2d054e964a274495bcc9953cf5b9cd340f7bcb` |
-| Decomp-workbench function hash | `71173e393c58` |
+| Route | Result | Status |
+|---|---:|---|
+| IDO 7.1 C | **0 words** | Exact and reproducible with the exported decomp.me context |
+| IDO 7.1 NCC/EDG C++ | **2 words** | Best ordinary C++ result; not solved |
+| Legacy cfront 3.0.1 -> IDO 7.1 C backend | **0 words** | Exact local experiment; not an ordinary NCC or hosted decomp.me match |
 
-The matching path is:
+The conservative integration recommendation is a third **C** split at C1D4.
+The legacy-cfront result is useful provenance evidence, but it should not be
+presented as a completed `ido7.1_c++` match.
+
+See [STATUS.md](STATUS.md) for the decision in compact form.
+
+## Legacy-cfront experiment
+
+The experimental exact path is:
 
 ```text
 valid C++ source
@@ -22,22 +27,22 @@ valid C++ source
     -> exact MIPS-II object
 ```
 
-This resolves the apparent contradiction around the overlay split. The source
-can remain in a C++ region and retain the expected C++ symbol, while the legacy
-C++ compiler lowers it through C. It is not necessary to relabel the function
-as C merely because the stock C frontend was previously the only known exact
-route.
+This demonstrates a plausible reason that C++ source could produce C-like
+codegen: legacy cfront translates C++ into C before the IDO optimizer. It does
+not demonstrate that the ordinary IDO 7.1 NCC/EDG compiler selected by the
+existing decomp.me scratch produces the match.
 
 ## Recommended split
 
 Keep the established IRIX4 and NCC spans unchanged, then split once more at
-`func_ovl8_8037C1D4` and compile that final function as C++ through the legacy
-`-use_cfront` route.
+`func_ovl8_8037C1D4` and compile that final function as C with the stock IDO
+7.1 C route.
 
-Do not apply cfront to the surrounding NCC translation unit. A control build
-of `func_ovl8_8037B760` through the same route emits 32 instructions instead of
-the ROM's 36 and has 27 opcode differences. The cfront result is therefore a
-narrow mechanism for C1D4, not a replacement for the coherent NCC span.
+If a complete IDO 7.1 OCC/cfront installation later reproduces the local
+cfront result, the third split can be reconsidered as legacy-cfront C++.
+Do not apply cfront to the surrounding NCC translation unit: a control build of
+`func_ovl8_8037B760` emits 32 instructions instead of the ROM's 36 and has 27
+opcode differences.
 
 See [Integration](docs/INTEGRATION.md) for the proposed layout and the source
 details that must be preserved.
@@ -62,18 +67,18 @@ SSB_REPO=/path/to/ssb-decomp-re \
 ```
 
 The compiler distinction is essential. The ZIP metadata selects ordinary
-`ido7.1_c++` NCC; compiling `scratch.c` directly through that frontend does
-not match. `scratch.c` is the exact C-stage control produced by the compiler
-model described here. The corresponding valid C++ input remains
+`ido7.1_c++` NCC; compiling `scratch.c` through that frontend does not match.
+For a decomp.me zero, create a C scratch with the same target, context, and
+flags. The corresponding legacy-cfront C++ experiment remains
 [src/func_ovl8_8037C1D4.C](src/func_ovl8_8037C1D4.C), which must first pass
 through legacy cfront.
 
 ## Repository contents
 
-- [Exact C++ source](src/func_ovl8_8037C1D4.C)
+- [Legacy-cfront C++ input](src/func_ovl8_8037C1D4.C)
 - [ZIP-compatible C scratch](scratch.c)
 - [Generated cfront C](generated/cfront-output.c)
-- [Matching object](artifacts/func_ovl8_8037C1D4.o)
+- [Legacy-cfront reference object](artifacts/func_ovl8_8037C1D4.o)
 - [Exact-match receipt](evidence/EXACT-MATCH.md)
 - [Candidate disassembly](evidence/candidate-disassembly.txt)
 - [Compiler provenance](docs/COMPILER-PROVENANCE.md)
@@ -109,10 +114,11 @@ AT&T USL C++ Language System <3.0.1> 02/03/92
 ```
 
 Its generated C was compiled with the project's IDO 7.1 C pipeline. This is a
-reproducible compiler-mechanism result, not proof that a particular 7.4.4
-binary built the original game. SGI documented the legacy translator as an
-available `-32 -use_cfront` path; an exact 7.1 OCC/cfront package would be the
-preferred final provenance check.
+reproducible compiler-mechanism experiment, not a conventional IDO 7.1 C++
+match and not proof that a particular 7.4.4 binary built the original game.
+SGI documented the legacy translator as an available `-32 -use_cfront` path;
+an exact 7.1 OCC/cfront package would be required to strengthen that provenance
+claim.
 
 No SGI compiler binaries, ROM data, target objects, or optimizer intermediates
 are distributed here.
