@@ -1,0 +1,70 @@
+
+# Display label normalized for readability. The artifact exports
+# func_ovl8_8037C1D4__FPPUcT1l.
+
+artifacts/func_ovl8_8037C1D4.o:     file format elf32-tradbigmips
+
+
+Disassembly of section .text:
+
+00000000 <func_ovl8_8037C1D4>:
+   0:	8c820000 	lw	v0,0(a0)
+   4:	8ca30000 	lw	v1,0(a1)
+   8:	18c00036 	blez	a2,e4 <func_ovl8_8037C1D4+0xe4>
+   c:	00c03825 	move	a3,a2
+  10:	90460000 	lbu	a2,0(v0)
+  14:	30ce0080 	andi	t6,a2,0x80
+  18:	11c0001a 	beqz	t6,84 <func_ovl8_8037C1D4+0x84>
+  1c:	24c80001 	addiu	t0,a2,1
+  20:	00064023 	negu	t0,a2
+  24:	310800ff 	andi	t0,t0,0xff
+  28:	25080001 	addiu	t0,t0,1
+  2c:	00084400 	sll	t0,t0,0x10
+  30:	00084403 	sra	t0,t0,0x10
+  34:	00084c00 	sll	t1,t0,0x10
+  38:	2508ffff 	addiu	t0,t0,-1
+  3c:	00084400 	sll	t0,t0,0x10
+  40:	00094c03 	sra	t1,t1,0x10
+  44:	24420001 	addiu	v0,v0,1
+  48:	1120000c 	beqz	t1,7c <func_ovl8_8037C1D4+0x7c>
+  4c:	00084403 	sra	t0,t0,0x10
+  50:	00084c00 	sll	t1,t0,0x10
+  54:	904f0000 	lbu	t7,0(v0)
+  58:	2508ffff 	addiu	t0,t0,-1
+  5c:	00084400 	sll	t0,t0,0x10
+  60:	00094c03 	sra	t1,t1,0x10
+  64:	00603025 	move	a2,v1
+  68:	24630001 	addiu	v1,v1,1
+  6c:	00084403 	sra	t0,t0,0x10
+  70:	24e7ffff 	addiu	a3,a3,-1
+  74:	1520fff6 	bnez	t1,50 <func_ovl8_8037C1D4+0x50>
+  78:	a0cf0000 	sb	t7,0(a2)
+  7c:	10000017 	b	dc <func_ovl8_8037C1D4+0xdc>
+  80:	24420001 	addiu	v0,v0,1
+  84:	00084400 	sll	t0,t0,0x10
+  88:	00084403 	sra	t0,t0,0x10
+  8c:	00084c00 	sll	t1,t0,0x10
+  90:	2508ffff 	addiu	t0,t0,-1
+  94:	00084400 	sll	t0,t0,0x10
+  98:	00094c03 	sra	t1,t1,0x10
+  9c:	24420001 	addiu	v0,v0,1
+  a0:	1120000e 	beqz	t1,dc <func_ovl8_8037C1D4+0xdc>
+  a4:	00084403 	sra	t0,t0,0x10
+  a8:	00405025 	move	t2,v0
+  ac:	00084c00 	sll	t1,t0,0x10
+  b0:	91580000 	lbu	t8,0(t2)
+  b4:	2508ffff 	addiu	t0,t0,-1
+  b8:	00084400 	sll	t0,t0,0x10
+  bc:	00094c03 	sra	t1,t1,0x10
+  c0:	00603025 	move	a2,v1
+  c4:	24630001 	addiu	v1,v1,1
+  c8:	00084403 	sra	t0,t0,0x10
+  cc:	24420001 	addiu	v0,v0,1
+  d0:	24e7ffff 	addiu	a3,a3,-1
+  d4:	1520fff4 	bnez	t1,a8 <func_ovl8_8037C1D4+0xa8>
+  d8:	a0d80000 	sb	t8,0(a2)
+  dc:	5ce0ffcd 	bgtzl	a3,14 <func_ovl8_8037C1D4+0x14>
+  e0:	90460000 	lbu	a2,0(v0)
+  e4:	ac820000 	sw	v0,0(a0)
+  e8:	03e00008 	jr	ra
+  ec:	aca30000 	sw	v1,0(a1)

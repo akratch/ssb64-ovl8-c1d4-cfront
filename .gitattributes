@@ -1,0 +1,7 @@
+generated/* linguist-generated=true -whitespace
+artifacts/*.o binary
+*.txt text eol=lf
+*.md text eol=lf
+*.C text eol=lf
+*.c text eol=lf
+*.sh text eol=lf

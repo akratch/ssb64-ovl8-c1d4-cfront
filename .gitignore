@@ -1,0 +1,10 @@
+.DS_Store
+/target/
+/work/
+/tmp/
+target.o
+*.B
+*.G
+*.O
+*.T
+!artifacts/*.o
