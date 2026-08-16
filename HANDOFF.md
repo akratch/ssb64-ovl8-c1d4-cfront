@@ -1,9 +1,23 @@
 # Maintainer handoff
 
-## Short answer
+## Did the comment help?
 
-Yes. The historical MIPSpro route can produce the four-case jump tables, and
-it also gives `func_ovl8_8037C1D4` a proper byte-perfect C++ match.
+Yes. The maintainer suggested that a C++ build capable of producing the
+four-case jump tables might explain more of the overlay than a separate IRIX4
+region, and asked whether the MIPSpro route could emit those tables.
+
+It identified the right missing experiment. We had been treating the C++ and
+IRIX4 results as alternatives. Running authentic MIPSpro C++ 7.1 `OCC -irix4`
+showed that they are one historical driver route: cfront translates the C++,
+then `cc -irix4` selects `accom`, followed by the 7.1 optimizer/backend.
+
+It also led directly to checking the whole object rather than only C1D4. That
+check found all four dense four-entry jump tables under the same route.
+
+## Answer
+
+Yes. The historical MIPSpro route produces the four-case jump tables, and it
+also gives `func_ovl8_8037C1D4` a proper byte-perfect C++ match.
 
 The key is that “C++” and “IRIX4 `accom`” are not competing explanations.
 Authentic MIPSpro C++ 7.1 `OCC -irix4` prints this pipeline:
@@ -55,15 +69,17 @@ to be closed under that route before changing the overlay's final splits.
 
 ## Suggested reply
 
-> You were right to question the split. I found the actual historical route,
-> and it turns out the C++ and IRIX4 theories are compatible: MIPSpro C++ 7.1
-> `OCC -irix4` runs the IRIX4 preprocessor, legacy cfront, then `cc -irix4`
-> (`accom`) before the 7.1 backend. With the exact period tools, C1D4 is a
-> proper C++ zero: 60 instructions / 240 bytes, no differing words. The same
-> route emits all four dense four-entry jump tables; three table functions are
-> already instruction-exact, while 80379070 has the right 524-instruction/table
-> shape but still needs source tuning. A whole-source census is 64/74 exact
-> with BF68 omitted for an old-parser incompatibility. So I would not add a
-> fake C split at C1D4, but I also would not claim the entire overlay is proven
-> single-compiler until the remaining source residues are closed. The repo now
-> has the driver transcript, exact object, hashes, and census.
+> That suggestion helped a lot—it exposed the missing compiler route. MIPSpro
+> C++ 7.1 `OCC -irix4` does not choose between C++ and IRIX4: it runs the IRIX4
+> preprocessor, translates the C++ with legacy cfront, then invokes
+> `cc -irix4`/`accom` before the 7.1 backend. Using the exact period components,
+> C1D4 is now a proper C++ zero: 60 instructions / 240 bytes with no differing
+> words. I also checked the jump-table question directly. The same route emits
+> all four dense four-entry tables; three table functions are instruction-exact,
+> and 80379070 has the correct 524-instruction/table shape but still has source
+> residue. The current whole-source census is 64/74 exact, with BF68 omitted for
+> an old-parser incompatibility. So your one-C++-route theory is now strongly
+> supported, and there is no reason to add a fake C split for C1D4. I would stop
+> just short of calling the whole overlay proven until the remaining source
+> residues close. The repo contains the exact object, source, driver transcript,
+> hashes, jump-table receipt, and census.

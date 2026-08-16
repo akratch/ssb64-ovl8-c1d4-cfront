@@ -57,7 +57,7 @@ The matching function is exactly `0xF0` bytes and has no relocations.
 ## Recommended project decision
 
 1. Do not create a C-only file at C1D4.
-2. Add or prototype an `OCC -irix4` compiler configuration in the build.
+2. Add an `OCC -irix4` compiler configuration in the build.
 3. Compile the existing overlay source through it and compare at function
    boundaries.
 4. Integrate the externally solved `803787C0` source before repeating the

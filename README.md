@@ -47,6 +47,23 @@ native 7.1 `acpp` stand-in documented in the
 [whole-object receipt](evidence/OCC-IRIX4-WHOLE-OBJECT.md); the exact C1D4
 receipt uses the historical IRIX4 `acpp` itself.
 
+## Why the maintainer's question mattered
+
+The maintainer suggested that a C++ build capable of producing the four-case
+jump tables might explain more of the overlay than a separate IRIX4 region,
+and asked whether the MIPSpro route could emit those tables.
+
+Yes, it helped materially. It exposed a false choice in the earlier model.
+Testing the authentic MIPSpro driver showed that C++ and IRIX4 are parts of
+the same supported configuration: `OCC -irix4` translates C++ with cfront and
+then deliberately invokes `cc -irix4`, which selects `accom`.
+
+That observation also prompted the whole-object and relocation census. The
+result is stronger than a one-function compiler trick: the route emits all
+four dense tables, makes three table-owning functions exact, and makes C1D4
+exact as C++. The remaining nonmatching functions prevent us from promoting
+“likely compiler for all of `ovl8_8`” to a proven fact yet.
+
 ## Exact C1D4 source
 
 [`src/func_ovl8_8037C1D4.C`](src/func_ovl8_8037C1D4.C) is valid C++ and emits
@@ -88,16 +105,13 @@ The IRIX4 C frontend comes from IRIS Development Option 5.1. The media hashes
 match the public archival catalog. No proprietary compiler binary is included
 here; see [Compiler provenance](docs/COMPILER-PROVENANCE.md).
 
-## What this changes
+## Interpretation
 
-The previous recommendation was a narrow third C++ split at C1D4 using cfront
-followed by the ordinary IDO 7.1 C frontend. That route is still an exact
-existence proof, but it is no longer the best historical explanation.
-
-The stronger model is the documented `OCC -irix4` route: legacy C++ translation
-followed by IRIX4 `accom`, with the IDO 7.1 optimizer/backend. It explains both
-C++ source provenance and the four dense jump tables in one compiler
-configuration. A third split should not be added merely to make C1D4 C.
+The best historical model is the documented `OCC -irix4` route: legacy C++
+translation followed by IRIX4 `accom`, with the IDO 7.1 optimizer/backend. It
+explains both C++ source provenance and the four dense jump tables in one
+compiler configuration. A third C split should not be added merely to make
+C1D4 match.
 
 This repository does not claim that the entire overlay has already been
 proven under one compiler. `80379070`, `8037ACAC`, `8037B760`, the externally
@@ -111,16 +125,12 @@ words short. A public zero therefore needs a distinct compiler preset that
 models `OCC -irix4`; changing only the source pane cannot make the NCC preset
 use cfront and `accom`.
 
-The existing decomp.me prototype in this repository proves that a hosted
-legacy-cfront preset is practical and yields a C++ zero. Its backend was the
-ordinary IDO 7.1 C frontend. It should now be revised to use the already
-available IRIX4 `accom` frontend wrapper so the hosted preset follows the
-authentic `OCC -irix4` transcript.
-
 For an immediate hosted zero today, the downstream C control in
 [`scratch.c`](scratch.c) works with an IDO 7.1 C scratch. For the historically
 stronger C++ result, use [`decompme/scratch.cxx`](decompme/scratch.cxx) after a
-combined legacy-cfront/IRIX4 preset is deployed.
+combined legacy-cfront/IRIX4 preset is deployed. This repository deliberately
+contains only the evidence-backed preset requirements; they are documented in
+[`decompme/README.md`](decompme/README.md).
 
 ## Repository map
 
