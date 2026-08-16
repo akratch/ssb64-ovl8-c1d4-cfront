@@ -1,5 +1,11 @@
 # decomp.me compiler-image receipt
 
+> **Historical prototype:** this image proves hosted cfront integration and an
+> exact C++ result, but its generated C uses the ordinary IDO 7.1 C frontend.
+> The later authentic `OCC -irix4` transcript selects IRIX4 `accom` instead.
+> Retain this receipt as an implementation control; revise the final frontend
+> before upstreaming the preset.
+
 ## Patch bases
 
 ```text

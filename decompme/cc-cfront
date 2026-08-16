@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""decomp.me compiler wrapper for the MIPSpro C++ 7.1 cfront route."""
+"""Prototype cfront-to-IDO7.1-C wrapper; see README before upstream use."""
 
 from __future__ import annotations
 

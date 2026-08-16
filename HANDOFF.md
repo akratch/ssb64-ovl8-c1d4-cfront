@@ -2,54 +2,68 @@
 
 ## Short answer
 
-Yes: `func_ovl8_8037C1D4` has a proper, byte-perfect C++ match.
+Yes. The historical MIPSpro route can produce the four-case jump tables, and
+it also gives `func_ovl8_8037C1D4` a proper byte-perfect C++ match.
 
-MIPSpro C++ 7.1 provided two distinct C++ routes. The current decomp.me
-`ido7.1_c++` preset uses NCC/EDG. The exact result uses the historically
-supported legacy `-use_cfront` route: cfront 3.0.1 translates valid C++ to C,
-then the IDO 7.1 C backend emits the object. Authentic November 1996 MIPSpro
-C++ 7.1 media was recovered and independently confirms the result.
-
-The exact candidate is 60 instructions and 240 bytes, with zero opcode,
-register, or raw-word differences.
-
-## Why a third split is justified
-
-The surrounding C++ translation unit remains correctly modeled by NCC. A
-representative surrounding function compiled through legacy cfront changes
-from 36 to 32 instructions and fails structurally. C1D4 has no calls, literals,
-or relocations tying it to that preceding unit, and it sits at the natural end
-boundary. The smallest evidence-backed layout is therefore:
+The key is that “C++” and “IRIX4 `accom`” are not competing explanations.
+Authentic MIPSpro C++ 7.1 `OCC -irix4` prints this pipeline:
 
 ```text
-existing IRIX4 region  -> unchanged
-existing NCC C++ span  -> unchanged
-func_ovl8_8037C1D4     -> C++, MIPSpro 7.1 legacy cfront
+/usr/irix4/usr/lib/acpp
+/usr/irix4/usr/lib/c++/cfront
+/usr/bin/cc ... -irix4 -nocpp
 ```
 
-This is not relabeling a C match as C++. The checked-in input is accepted as
-C++, emits the expected cfront-mangled symbol, and passes through the authentic
-C++ translator before the matching IDO backend.
+The final driver step selects the IRIX4 `accom` frontend before the IDO 7.1
+optimizer/backend. This is one supported C++ compiler configuration.
 
-## decomp.me status
+## Direct measurements
 
-The current public compiler list cannot express the legacy route, so the old
-`mdYYe` scratch cannot show zero under `ido7.1_c++`. This repository includes
-reviewable patches for a separate `ido7.1_cfront` compiler image and app preset.
-That exact image has already reproduced the exported `mdYYe` context and target
-at zero words.
+- C1D4: 60 instructions, 240 bytes, zero differing words.
+- Whole current catalog: 64 of 74 compiled functions are instruction-word
+  exact; BF68 was omitted for one old-parser source incompatibility.
+- Jump-table section: `0x50` bytes with 16 `R_MIPS_32` entries, arranged as
+  four dense four-entry tables.
+- `803773CC`, `803781A4`, and `80379D74`: zero instruction-word differences.
+- `80379070`: emits the fourth dense table and the correct 524-instruction
+  function size, but the current cfront source spelling remains 179 words off.
 
-After the two patches are merged and deployed, select `IDO 7.1 C++ (legacy
-cfront)`, retain `-O2 -mips2`, and paste [`decompme/scratch.cxx`](decompme/scratch.cxx).
+That last result is important: it proves capability and table geometry, not a
+finished one-compiler reconstruction for every function.
+
+## Provenance
+
+The `OCC` driver came from authentic MIPSpro C++ 7.1 media. The exact
+`/usr/irix4/usr/lib/c++/cfront` named by the driver came from SGI C++
+Translator 3.2's `irix4_c++` compatibility product and is byte-identical to
+the standalone C++ Translator 3.0.1 executable. The IRIX4 C frontend came from
+IRIS Development Option 5.1.
+
+The repository includes hashes, generated C, static objects, the exact driver
+transcript, and the whole-object census. It does not redistribute SGI tools or
+ROM-derived targets.
+
+## Recommendation
+
+Do not add a third C file at C1D4 merely to make the function match. The exact
+C++ source and a historically coherent compiler route now exist.
+
+Also do not claim yet that every `ovl8_8` function is proven to use one
+compiler. The unified route is now a strong candidate, but the remaining
+source residues—especially `80379070`, `8037ACAC`, and `8037B760`—still need
+to be closed under that route before changing the overlay's final splits.
 
 ## Suggested reply
 
-> We found the missing compiler path. The function does have a byte-perfect
-> C++ match, but not under the current NCC-based `ido7.1_c++` preset. Authentic
-> MIPSpro C++ 7.1 media confirms it matches through the documented legacy
-> cfront 3.0.1 route followed by the IDO 7.1 C backend: 60 instructions, 240
-> bytes, zero differences. The preceding C++ span still belongs on NCC, so the
-> evidence supports a narrow third C++ split at C1D4. The repo includes the
-> exact source, provenance, static receipts, and apply-ready decomp.me compiler
-> and application patches. Once that preset is deployed, the exported scratch
-> reproduces a zero.
+> You were right to question the split. I found the actual historical route,
+> and it turns out the C++ and IRIX4 theories are compatible: MIPSpro C++ 7.1
+> `OCC -irix4` runs the IRIX4 preprocessor, legacy cfront, then `cc -irix4`
+> (`accom`) before the 7.1 backend. With the exact period tools, C1D4 is a
+> proper C++ zero: 60 instructions / 240 bytes, no differing words. The same
+> route emits all four dense four-entry jump tables; three table functions are
+> already instruction-exact, while 80379070 has the right 524-instruction/table
+> shape but still needs source tuning. A whole-source census is 64/74 exact
+> with BF68 omitted for an old-parser incompatibility. So I would not add a
+> fake C split at C1D4, but I also would not claim the entire overlay is proven
+> single-compiler until the remaining source residues are closed. The repo now
+> has the driver transcript, exact object, hashes, and census.

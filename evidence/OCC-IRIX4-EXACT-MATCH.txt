@@ -1,0 +1,3 @@
+verdict=instruction-words-identical aligned_total=0 words=0 raw=0 opcodes=0 gaps=0 reloc_syms=0 norm=0 regs=0 fp=0 insns=60 frame=None sha1=71173e393c58 artifacts/func_ovl8_8037C1D4.o
+register ranges: none
+FP ranges: none

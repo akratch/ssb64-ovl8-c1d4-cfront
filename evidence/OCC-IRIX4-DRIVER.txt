@@ -1,0 +1,9 @@
+/usr/irix4/usr/lib/acpp: acpp -B -D__cplusplus=1 -D_LANGUAGE_C_PLUS_PLUS=1 -undef -trigraphs -p -D__sgi -D__unix -D__mips -D__host_mips -D_MIPSEB -D_MODERN_C -D_MIPS_FPSET=16 -D_MIPS_ISA=_MIPS_ISA_MIPS1 -D_MIPS_SIM=_MIPS_SIM_ABI32 -D_MIPS_SZINT=32 -D_MIPS_SZLONG=32 -D_MIPS_SZPTR=32 -D__DSO__ -D_SYSTYPE_SYSV -D__SVR3 -D__STDC__ -D__EXTENSIONS__ -Dsgi -Dunix -Dmips -Dhost_mips -DMIPSEB -D_SGI_SOURCE -DSYSTYPE_SYSV -DSVR3 -nostdinc -I/usr/irix4/usr/include/CC -I/usr/irix4/usr/include /w/input.C
+/usr/irix4/usr/lib/c++/cfront: cfront +f/w/input.C +T/var/tmp/aaaa00001/dirinst +s +t/var/tmp/aaaa00001/ptcf
+/usr/bin/cc: cc -xansi -D__cplusplus -D_LANGUAGE_C_PLUS_PLUS=1 -w -v -O2 -mips2 -irix4 -nocpp -c -Wf,-XNh8000 input..c -lC
+rm input..c
+/usr/irix4/usr/lib/c++/markc++: markc++ input..o
+mv: mv input..o input.o
+rm: rm -rf /var/tmp/aaaa00001
+C++ (Ver. 3.2),		CC ($Revision: 1.86 $ $Date: 1995/03/22 01:45:59 $)
+CCPATH =

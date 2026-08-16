@@ -1,4 +1,4 @@
-# 1 "input-exact.C"
+# 1 "input.C"
 typedef signed short s16;
 typedef signed long s32;
 typedef unsigned char u8;

@@ -1,10 +1,9 @@
 # Status
 
-## What is solved
+## Solved
 
-`func_ovl8_8037C1D4` has an exact C++ match through the authentic MIPSpro C++
-7.1 legacy-cfront route. The translator came from SGI CD `812-0400-005`, emits
-the checked-in generated C byte for byte, and the IDO 7.1 backend produces:
+`func_ovl8_8037C1D4` has an exact C++ match through the authentic historical
+`OCC -irix4` route:
 
 ```text
 60 instructions / 0xF0 bytes
@@ -13,36 +12,40 @@ the checked-in generated C byte for byte, and the IDO 7.1 backend produces:
 0 register differences
 ```
 
-The root `scratch.c` independently reproduces the same target as a stock IDO
-7.1 C-stage control against the exported decomp.me ZIP.
+The route is C++ cfront followed by IRIX4 `accom`, then the IDO 7.1
+optimizer/backend. It is directly printed by the MIPSpro C++ 7.1 OCC driver.
 
-## decomp.me status
+## Jump tables
 
-The current `ido7.1_c++` preset selects NCC/EDG, not legacy cfront. The
-strongest NCC candidate preserves the complete 60-instruction structure and
-differs only here:
+The same whole-object build emits four dense four-entry tables. The candidate
+has a `0x50`-byte `.rodata` section and 16 table relocations at four consecutive
+four-word ranges.
 
-```text
-target:    negu  t0,a2
-target:    andi  t0,t0,0xff
+Three table functions are instruction-word exact. `80379070` emits the fourth
+table and retains the correct 524-instruction function size, with 179 current
+source differences.
 
-NCC best:  negu  t2,a2
-NCC best:  andi  t0,t2,0xff
-```
+## Whole-source census
 
-That is a two-word NCC register-allocation residue. It does not invalidate the
-exact C++ result; it demonstrates that decomp.me needs a distinct compiler
-preset.
+The current catalog source gives 64 exact functions out of 74 compiled. BF68
+was omitted because the legacy parser rejects one current reconstructed source
+construct. The remaining mismatches are not evidence that the compiler cannot
+emit the ROM; several are known alternate-frontend or incomplete-context
+source forms.
 
-Apply-ready changes for that preset are included in
-[`patches/decompme-compilers.patch`](patches/decompme-compilers.patch) and
-[`patches/decompme-app.patch`](patches/decompme-app.patch). The compiler image
-built from those changes reproduces the original `mdYYe` context and target at
-zero words. Production decomp.me still needs to merge and deploy the preset
-before a public zero-score scratch can be created.
+## Decision
 
-## Recommended decision
+Do not make C1D4 a C file solely to obtain a match. A proper historical C++
+zero now exists.
 
-Use a third C++ split at `func_ovl8_8037C1D4` and route it through MIPSpro C++
-7.1 legacy cfront. Keep the preceding translation unit on NCC; compiling a
-surrounding anchor through cfront fails structurally.
+Treat a single `OCC -irix4` compiler for the overlay as a strong working
+hypothesis, not a settled conclusion. Close the remaining source residues
+before changing the final Splat boundaries.
+
+## decomp.me
+
+The ordinary `ido7.1_c++` preset remains two register words short because it
+uses NCC/EDG. A public C++ zero needs a separate preset that chains legacy
+cfront into the existing IRIX4 `accom` route. The checked-in hosted prototype
+proves feasibility but predates this stronger driver-provenance result and
+should be revised before upstream submission.

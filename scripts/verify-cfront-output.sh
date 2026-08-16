@@ -8,7 +8,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 if [ -z "${CFRONT:-}" ]; then
-    echo "CFRONT must name an authentic MIPSpro C++ 7.1 cfront executable" >&2
+    echo "CFRONT must name the authentic IRIX4 cfront executable" >&2
     exit 2
 fi
 
@@ -33,9 +33,9 @@ if [ -n "${QEMU_IRIX:-}" ]; then
         exit 2
     fi
     nice -n 10 "$QEMU_IRIX" -silent -L "$IRIX_ROOT" "$CFRONT" \
-        +finput-exact.C < "$input" > "$output"
+        +finput.C < "$input" > "$output"
 else
-    nice -n 10 "$CFRONT" +finput-exact.C < "$input" > "$output"
+    nice -n 10 "$CFRONT" +finput.C < "$input" > "$output"
 fi
 
 if ! cmp "$output" "$reference"; then

@@ -57,11 +57,14 @@ negative control, the same context and `scratch.c` compiled under the archive's
 NCC preset produced 57 true instructions and a structural mismatch of 54 words
 and 43 opcodes.
 
-This is expected and is central to the provenance result:
+This is expected. The root scratch is a deterministic downstream C control,
+not the final historical compiler model:
 
 ```text
-candidate C++ source -> legacy cfront -> exact C-stage source -> IDO 7.1 CFE
+scratch.c -> IDO 7.1 CFE -> exact control object
 ```
 
-The root `scratch.c` preserves the exact downstream stage so the challenge can
-be checked deterministically. It must not be presented as an NCC match.
+The stronger historical route established later is C++ -> legacy cfront ->
+IRIX4 `accom` -> IDO 7.1 backend, and it is also exact. The root `scratch.c`
+exists so the exported challenge can be checked on decomp.me today. It must
+not be presented as an NCC match or as proof of the original frontend.

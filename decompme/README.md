@@ -1,117 +1,49 @@
-# decomp.me compiler integration
+# decomp.me integration status
 
-The current decomp.me `ido7.1_c++` preset runs NCC/EDG. C1D4's exact C++
-result uses the different, historically supported MIPSpro 7.1 legacy-cfront
-route. It therefore needs a separate compiler ID, proposed as
-`ido7.1_cfront`.
+## Current public preset
 
-## Verified wrapper
+decomp.me's `ido7.1_c++` preset uses NCC/EDG. The best C1D4 source under that
+preset is structurally exact but differs in two temporary-register words.
+There is no source-only change that can select the historical cfront/IRIX4
+route inside that preset.
 
-[`cc-cfront`](cc-cfront) performs the same stages as the matching local
-receipt:
+## Required historical preset
 
-```text
-IDO 7.1 acpp
--> authentic MIPSpro C++ 7.1 cfront
--> IDO 7.1 cc backend
-```
-
-The wrapper accepts the same basic driver form used by decomp.me:
-
-```sh
-cc-cfront -c -G0 -non_shared -32 -O2 -mips2 -o output.o input.cxx
-```
-
-It forwards `-D`, `-U`, and `-I` options to the preprocessor and sends the
-remaining driver flags to the IDO 7.1 C backend. The input source must be the
-last argument.
-
-The package layout is:
+The evidence-backed preset should model MIPSpro C++ 7.1:
 
 ```text
-ido7.1_cfront/
-  acpp, cc, cfe, uopt, ugen, as1, ...
-  cc-cfront
-  qemu-irix
-  irix/
-    lib/{rld,libc.so.1,libmalloc.so}
-    usr/lib/libC.so
-    usr/lib/libc.so.1
-    usr/lib/c++/cfront
+OCC -irix4
+  -> IRIX4 acpp in C++ mode
+  -> /usr/irix4/usr/lib/c++/cfront 3.0.1
+  -> IRIX4 accom
+  -> IDO 7.1 uopt / ugen / as1
 ```
 
-[`build-local-package.sh`](build-local-package.sh) assembles this layout from
-an IDO 7.1 static-recomp package, the extracted MIPSpro C++ 7.1 product, an
-IRIX runtime root containing qemu and loader libraries, and the O32 `libC.so`
-runtime. It verifies the authentic cfront hash before accepting the package.
-No proprietary files are stored in this repository.
+decomp.me already carries the component logic for IDO 7.1 with the IRIX4
+`accom` frontend. The remaining integration is to place legacy cfront before
+that route and expose a distinct OLD_CXX compiler ID.
 
-## Hosted-style match receipt
+Once deployed:
 
-The wrapper was invoked on the exact decomp.me composition:
+1. import the original `mdYYe` scratch or exported ZIP;
+2. select the new legacy-cfront/IRIX4 compiler;
+3. retain `-O2 -mips2`;
+4. paste [`scratch.cxx`](scratch.cxx), preserving its leading blank lines and
+   physical backslash-newline splices;
+5. compile; the expected function result is zero words.
 
-```text
-#line 1 "ctx.c"
-<219,539-byte ctx.c++ from the challenge ZIP>
-#line 1 "src.cxx"
-<decompme/scratch.cxx>
-```
+## Existing prototype
 
-Using `-O2 -mips2` and the standard IDO O32 driver flags produced:
+[`cc-cfront`](cc-cfront), [`build-local-package.sh`](build-local-package.sh),
+and the two patch files under `patches/` are the earlier hosted prototype. That
+prototype proved that decomp.me can host cfront and reproduced the scratch at
+zero, but it sent generated C through the ordinary IDO 7.1 C frontend.
 
-```text
-candidate .text: 240 bytes
-target function: 240 bytes
-candidate SHA-1: 6d2d054e964a274495bcc9953cf5b9cd340f7bcb
-target SHA-1:    6d2d054e964a274495bcc9953cf5b9cd340f7bcb
-```
+The authentic `OCC -irix4` transcript found later is a stronger provenance
+result. The prototype patches are retained as implementation reference, not as
+the final upstream recommendation. Before submission, replace their final C
+stage with decomp.me's existing IRIX4 `accom` wrapper and source the exact
+`irix4_c++` cfront identified in
+[`docs/COMPILER-PROVENANCE.md`](../docs/COMPILER-PROVENANCE.md).
 
-This is the source to paste into an `ido7.1_cfront` scratch after the preset is
-deployed:
-[`scratch.cxx`](scratch.cxx). Its five leading blank lines and two physical
-backslash-newline splices are intentional.
-
-## Ready-to-apply patches
-
-Two format-patch files are included:
-
-- [`decompme-compilers.patch`](../patches/decompme-compilers.patch), based on
-  `decompme/compilers` commit `9083bacade9276cf6b48a5a628adcbeee53499a6`;
-- [`decompme-app.patch`](../patches/decompme-app.patch), based on
-  `decompme/decomp.me` commit `95329db504c88750fa932c81fd405834ffb372d8`.
-
-The compiler patch downloads only the two required `c++_dev` byte ranges from
-the uncompressed archival media tar (9,314,839 bytes total), verifies both by
-SHA-256, extracts only `cfront`, and assembles a minimal compiler directory.
-No SGI binary is committed to either patch or this repository.
-
-The generated image was built and then used with the exact exported `mdYYe`
-context, source composition, flags, and target. The result was byte-identical;
-see [`DECOMPME-IMAGE.md`](../evidence/DECOMPME-IMAGE.md).
-
-## Application changes
-
-decomp.me needs three small application changes:
-
-1. Define an `IDOCompiler` named `ido7.1_cfront`, based on IDO 7.1 and using
-   `Language.OLD_CXX`.
-2. Add its compiler image to the N64 Linux compiler list.
-3. Add a UI label such as `IDO 7.1 C++ (legacy cfront)`.
-
-The compiler image is built from archival media at deployment time because
-MIPSpro is proprietary. The source media and exact tool hashes are recorded in
-[`AUTHENTIC-71.md`](../evidence/AUTHENTIC-71.md).
-
-## Creating the hosted scratch
-
-Once both patches are deployed:
-
-1. Import the original `mdYYe` scratch or its exported ZIP.
-2. Select `IDO 7.1 C++ (legacy cfront)`.
-3. Keep flags `-O2 -mips2`.
-4. Replace only the source pane with [`scratch.cxx`](scratch.cxx), preserving
-   its leading blank lines and trailing backslashes.
-5. Compile. The expected score is zero.
-
-Until the new preset is deployed, ordinary `IDO 7.1 C++` continues to use NCC
-and cannot host this exact result.
+No proprietary compiler binary is stored in this repository.

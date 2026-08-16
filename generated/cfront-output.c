@@ -1,9 +1,9 @@
-# 1 "input-exact.C"
+# 1 "input.C"
 
 /* <<AT&T USL C++ Language System <3.0.1> 02/03/92>> */
-/* < input-exact.C > */
+/* < input.C > */
 
-# 1 "input-exact.C"
+# 1 "input.C"
 void *__vec_new (void *, int , int , void *);
 
 # 1
@@ -22,7 +22,7 @@ typedef short s16 ;
 typedef long s32 ;
 typedef unsigned char u8 ;
 typedef unsigned int u32 ;
-extern struct __mptr* __ptbl_vec__input_exact_C_func_ovl8_8037C1D4_[];
+extern struct __mptr* __ptbl_vec__input_C_func_ovl8_8037C1D4_[];
 void func_ovl8_8037C1D4__FPPUcT1l (u8 **__1src , u8 **__1dest , s32 __1count )
 # 7
 { 
@@ -46,10 +46,10 @@ u32 __2next ;
 
 # 18
 __2curr = ((*__1var_v0 ));
-__2next = (((*__1var_v0 ))+ 1);
+__2next = (((*__1var_v0 ))+ 1 );
 
 # 21
-if (__2curr & 128)
+if (__2curr & 0x80 )
 # 22
 { 
 # 23
@@ -57,7 +57,7 @@ s16 __3run_length ;
 s16 __3temp_t1 ;
 
 # 23
-__3run_length = ((((unsigned char )(- (__2curr ++ ))))+ 1);
+__3run_length = ((((unsigned char )(- (__2curr ++ ))))+ 1 );
 
 # 25
 __1var_v0 ++ ;
@@ -94,7 +94,7 @@ s16 __3run_length ;
 s16 __3temp_t1 ;
 
 # 41
-__3run_length = ((__2curr ++ )+ 1);
+__3run_length = ((__2curr ++ )+ 1 );
 
 # 43
 __1var_v0 ++ ;

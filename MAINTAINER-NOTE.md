@@ -1,41 +1,26 @@
-# Maintainer summary
+# Maintainer note
 
-`func_ovl8_8037C1D4` has a proper zero-difference C++ match through the
-authentic MIPSpro C++ 7.1 legacy-cfront route.
+You were right to question the split. The actual historical route makes the
+C++ and IRIX4 observations compatible: MIPSpro C++ 7.1 `OCC -irix4` invokes
+the IRIX4 preprocessor, legacy cfront, and then `cc -irix4` (`accom`) before
+the IDO 7.1 optimizer/backend.
 
-The source is valid C++ and exports the expected mangled symbol. It passes
-through the `cfront` supplied on SGI's November 1996 MIPSpro C++ 7.1 CD, then
-through the project's IDO 7.1 C backend. The resulting function is exactly 60
-instructions / `0xF0` bytes, with zero opcode, register, schedule, or raw-word
-differences.
+Using the exact period tools, `func_ovl8_8037C1D4` is a proper C++ zero: 60
+instructions / 240 bytes with no differing words.
 
-The supported integration is a third C++ split at C1D4:
+The same route emits all four dense four-entry jump tables. Three table
+functions are already instruction-exact. `func_ovl8_80379070` emits the fourth
+table and the correct 524-instruction shape, but its current source remains
+179 words off after cfront, so that is source work rather than a table-capability
+failure.
 
-- retain the first IRIX4 region;
-- retain the established IDO 7.1 NCC C++ region;
-- compile C1D4 alone with MIPSpro C++ 7.1 legacy cfront.
+A current whole-source census is 64 exact functions out of 74 compiled. BF68
+was omitted because its reconstructed spelling is not accepted by the 1992
+parser. This is strong evidence for a unified historical C++/IRIX4 route, but
+not yet proof that every function used it.
 
-The narrow split matters. A surrounding NCC anchor, `func_ovl8_8037B760`, was
-compiled through the same cfront route and failed structurally (32 instructions
-versus the ROM's 36, with 27 opcode differences). The result does not imply
-that the whole second region should use cfront.
-
-Two physical backslash-newline splices in the source are required. Removing
-them retains the instruction multiset but leaves eight schedule differences.
-The unused local and explicit post-decrement temporaries are likewise part of
-the tested source geometry.
-
-The repository root also contains `scratch.c`, freshly verified against the
-exported challenge ZIP's exact context and target. It is the downstream IDO
-7.1 C-stage control. The ZIP's ordinary NCC preset does not match that file
-because decomp.me currently has no legacy-cfront preset.
-
-Compiler provenance is now direct: the recovered 7.1 translator is distinct
-from the earlier 7.4.4 binary, has a November 12, 1996 SGI build stamp, and
-emits the exact same generated C byte for byte. Its final 240-byte function is
-identical to the target, SHA-1
-`6d2d054e964a274495bcc9953cf5b9cd340f7bcb`.
-
-Start with [the integration note](docs/INTEGRATION.md), then use the
-[exact-match receipt](evidence/EXACT-MATCH.md) and
-[compiler provenance](docs/COMPILER-PROVENANCE.md) for review.
+I would therefore avoid a third C split at C1D4. I would also hold off on
+changing the whole overlay to one compiler until the remaining source residues
+are closed. The repository contains the authentic driver transcript, exact
+C1D4 source/object, tool and media hashes, jump-table evidence, and the full
+census.

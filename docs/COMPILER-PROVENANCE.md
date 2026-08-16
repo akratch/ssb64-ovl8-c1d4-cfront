@@ -1,111 +1,125 @@
 # Compiler provenance
 
-> **Status:** Authentic MIPSpro C++ 7.1 legacy cfront reproduces the function
-> exactly. This compiler route is not currently available on decomp.me.
+## Driver proof
 
-## Proven route
+MIPSpro C++ 7.1's authentic `OCC` driver was invoked in dry-run mode with:
 
-The exact object was produced in two compiler stages:
+```sh
+OCC -v -n -c -O2 -mips2 -irix4 input.C
+```
 
-1. The legacy C++ translator from MIPSpro C++ 7.1 converted
-   `src/func_ovl8_8037C1D4.C` into `generated/cfront-output.c`.
-2. The generated C was compiled by the project's IDO 7.1 C pipeline
-   (`cfe -> uopt -> ugen -> as1`) at `-O2` for big-endian MIPS-II O32.
+It selected:
 
-The translator identifies itself in the generated file as:
+```text
+/usr/irix4/usr/lib/acpp
+/usr/irix4/usr/lib/c++/cfront
+/usr/bin/cc -xansi ... -O2 -mips2 -irix4 -nocpp ...
+```
+
+The complete output is checked in as
+[`evidence/OCC-IRIX4-DRIVER.txt`](../evidence/OCC-IRIX4-DRIVER.txt). This is
+direct evidence that legacy C++ translation and the IRIX4 C frontend were one
+supported compiler route.
+
+SGI's C++ documentation describes `OCC` as the cfront driver and documents
+`CC -use_cfront` as the equivalent route:
+
+- [Understanding the Silicon Graphics C++ Environment](https://techpubs.jurassic.nl/library/manuals/0000/007-0704-070/sgi_html/ch01.html)
+- [IRIX 5.3 OCC(1)](https://techpubs.jurassic.nl/manpages_0530/cat1/OCC.html)
+
+## Exact IRIX4 tools
+
+### C++ translator
+
+The exact path named by `OCC -irix4` was recovered from SGI C++ Translator
+3.2 media, part `812-0130-003`, inside the `irix4_c++` compatibility product:
+
+```text
+/usr/irix4/usr/lib/c++/cfront
+SHA-256 7bd7e85fd5b029392caffa2c32e52779a826706116f1df5f3e14eb61448e202e
+```
+
+This executable is byte-identical to the `cfront` on the independently
+archived C++ Translator 3.0.1 media, part `812-0001-005`. It identifies itself
+in generated output as:
 
 ```text
 AT&T USL C++ Language System <3.0.1> 02/03/92
 ```
 
-The final relocatable object contains one 240-byte function:
+Published media receipts:
 
 ```text
-func_ovl8_8037C1D4__FPPUcT1l
+C++ Translator 3.2 ISO SHA-256
+be4e149e845ae8ddee1d1efce7d95b0f2ab29a8c7312f40bbcf034995fd3444f
+
+C++ Translator 3.0.1 ISO SHA-256
+8815a92e77280201f055ea240c1ec2765791e12c99876748915b31abae28bb7f
 ```
 
-## Authentic 7.1 acquisition
+The [SGI media catalog](https://jrra.zone/sgi/index-with-ids.html) records both
+part numbers and hashes.
 
-The translator was recovered from SGI part `812-0400-005`, **MIPSpro C++
-7.1**, November 1996. The distribution identifies its compiler subsystem as
-`c++_dev.sw.c++` and contains `usr/lib/OCC` and
-`usr/lib/c++/{cfront,markc++,ptcomp,ptlink}`.
+### IRIX4-compatible C frontend
 
-The complete archival filesystem tar was 505,663,488 bytes:
+The IRIX4 `acpp`/`accom` frontend was recovered from IRIS Development Option
+5.1, part `812-0129-003`:
 
 ```text
-MD5     4ce49331d9dbc93e09d107597286cff3
-SHA-256 91e386a0e5509488f734e05d3833ca8cd66d117b18dcff28150d39aa29a6400a
+ISO SHA-256
+98a0eccec99cb7b06f787f3b16917386f7785133ae197c27d32eff78b9211776
 ```
 
-The extracted 7.1 translator is a big-endian MIPS-II IRIX executable with:
+The local ISO hash matches the published catalog exactly. Extracting the
+`IRIX4/irix4_c` product produced binaries byte-identical to the frontend used
+for the exact build:
 
 ```text
-SHA-256 173f6cf0dfeba2b667c83a650f83e0ccc4612365455957ce27bf60d42576e157
-banner  AT&T USL C++ Language System <3.0.1> 02/03/92
-stamp   IRIX 6.4:1263370533 built 11/12/96
+acpp  SHA-256 1d11da809d1a7f7bc2130d8f7fcd81ac5aa1c423c2f94b7617eaa132b962ef98
+accom SHA-256 f7255b029d79d49edea98079f56f80a32922532418d694d64b09703d2695bda6
 ```
 
-The matching 7.1 `acpp` has SHA-256
-`c569d619b3711860dd2f9a8d783f53bb54dafa00658a1eaaf93cff68975ae0af`
-and produces the checked-in 1,176-byte preprocessed input byte for byte.
+### MIPSpro C++ 7.1 driver
 
-The 7.1 cfront binary is distinct from the later 7.4.4 binary. Nevertheless,
-both translate this source to the exact same 1,794-byte C file, SHA-256
-`8aeeda992c66f6d2195f38fff78d122ab306740b31b33c37d60e17ca6ce32bc3`.
+The driver came from SGI MIPSpro C++ 7.1 media, part `812-0400-005`:
 
-The archival catalog and direct media are linked in
-[the authentic receipt](../evidence/AUTHENTIC-71.md). MIPSpro remains
-proprietary software; no compiler binary is distributed here.
+```text
+OCC SHA-256
+7f889ad27e8c0c0005580650a347a1b9afcbc95afb8d0c6707584b3b3c7379f0
+```
 
-## Tool receipt
+The same media also contains a later-built cfront 3.0.1 binary, but `-irix4`
+explicitly selects the compatibility path under `/usr/irix4`. The exact result
+therefore uses the old path named by the driver, not the default 7.1 cfront.
 
-| Component | Receipt SHA-256 |
+## Code-generation stages
+
+For the static receipt, the exact historical frontend stages produced C and
+ucode, followed by the project's IDO 7.1 `uopt`, `ugen`, and `as1` passes. The
+faithful `accom` options were recovered from the reconstructed IDO 7.1 driver:
+
+```text
+-Xv -w -XNh8000 -mips2 -EB -Xg0 -O2 -Xprototypes -Xxansi
+```
+
+With those options, C1D4 is instruction-word exact. Omitting the full driver
+option set had previously left four schedule differences, which is why the
+driver-level reconstruction mattered.
+
+## Exact C1D4 hashes
+
+| Artifact | SHA-256 |
 |---|---|
-| MIPSpro 7.1 `acpp` | `c569d619b3711860dd2f9a8d783f53bb54dafa00658a1eaaf93cff68975ae0af` |
-| MIPSpro C++ 7.1 `OCC` | `7f889ad27e8c0c0005580650a347a1b9afcbc95afb8d0c6707584b3b3c7379f0` |
-| MIPSpro C++ 7.1 `cfront` | `173f6cf0dfeba2b667c83a650f83e0ccc4612365455957ce27bf60d42576e157` |
-| IRIX 6.0 O32 `libC.so` | `6017cc3bc1ea7b1793425b19456b3cbc87d80393011f70fa50b12f5ae3fc0cea` |
-| Project IDO 7.1 `cc` wrapper | `fdc7cbaa936e11b731c9b50118d106efae71a299d59f1e8e2cd126306acbf78f` |
+| C++ source | `d4d22a92e0a063e018871965aa8af8733f28d7454a31a18de3b85f8af894c047` |
+| exact IRIX4 cfront | `7bd7e85fd5b029392caffa2c32e52779a826706116f1df5f3e14eb61448e202e` |
+| generated C | `8aa3d3343711a189499dea5484a018d31d0972b2d03a1c6f26cfbae9cb375d20` |
+| public reference object | `8a9fc764a7b45ab3df50b6c69e726e90e2549aeec05700c3ae764b0463f190df` |
 
-These proprietary components are identified for provenance only and are not
-part of this repository.
+The 240-byte function body has SHA-1
+`6d2d054e964a274495bcc9953cf5b9cd340f7bcb`, identical to the target.
 
-## Runtime note
+## Distribution and safety
 
-`libC.so` belongs to the separate IRIX C++ execution-environment product, not
-the `c++_dev` compiler CD. The translator was run in an ephemeral IRIX root
-using an authentic O32 `libC.so` from the local IRIX 6.0 package. That shared
-library only allows the translator executable to start; the recovered 7.1
-translator itself produced the generated C. All target code generation used
-the IDO 7.1 C pipeline.
-
-## What the receipt establishes
-
-It establishes a complete, exact C++ compiler route using the authentic 7.1
-translator and the target IDO 7.1 backend. It does not by itself prove which
-per-file compiler flags HAL used, but it removes the former 7.4.4-version
-caveat and satisfies the matching requirement.
-
-## Source and artifact hashes
-
-| File | SHA-256 |
-|---|---|
-| Exact C++ source | `d4d22a92e0a063e018871965aa8af8733f28d7454a31a18de3b85f8af894c047` |
-| Preprocessed cfront input | `dcb2abeb37bd78784147d91120865f76a49af1ec699e08ad27dab00928c92c08` |
-| Generated cfront C | `8aeeda992c66f6d2195f38fff78d122ab306740b31b33c37d60e17ca6ce32bc3` |
-| Unstripped build object | `520b17c334339a068093604932e3258ae0cbcffc252f8e81cae17fdd6dbc7f5c` |
-| Public object (`.mdebug` removed) | `e3dfd21abb1f880443eb0f66d3b7a87acb83464e0709a1ccfd4c40d38f1c002e` |
-
-The extracted 240-byte `.text` has SHA-1
-`6d2d054e964a274495bcc9953cf5b9cd340f7bcb`, identical to the target function.
-The public object differs from the build receipt only by removal of `.mdebug`,
-which contained a local build path; its `.text`, symbol, MIPS options, and
-register metadata are unchanged.
-
-## Historical references
-
-- [SGI C++ release notes](https://archive.irixnet.org/siliconsurf/tech/relnotes/6_0rel/cpp_dev.html)
-- [IRIX 5.3 CC/NCC manual](https://techpubs.jurassic.nl/manpages_0530/cat1/CC.html)
-- [SGI media catalog](https://jrra.zone/sgi/index-with-ids.html)
-- [SGI installation table](https://techpubs.jurassic.nl/library/manuals/2000/007-2852-002/sgi_html/apa.html)
+MIPSpro and IDO are proprietary. This repository records source media, hashes,
+driver output, generated C, and static target-code evidence without
+redistributing compiler binaries. No generated target program was executed.
