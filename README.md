@@ -3,6 +3,8 @@
 This repository records an exact C++ match for
 `func_ovl8_8037C1D4` and the compiler-provenance investigation behind it.
 
+For the complete proof in one document, see [`PROOF.md`](PROOF.md).
+
 The important result is that the two working theories were not mutually
 exclusive. Authentic MIPSpro C++ 7.1 `OCC -irix4` is one C++ driver route:
 
@@ -122,6 +124,7 @@ combined legacy-cfront/IRIX4 preset is deployed.
 
 ## Repository map
 
+- [Single-document proof](PROOF.md)
 - [Exact C++ input](src/func_ovl8_8037C1D4.C)
 - [Generated IRIX4-cfront C](generated/cfront-output.c)
 - [Reference object](artifacts/func_ovl8_8037C1D4.o)
